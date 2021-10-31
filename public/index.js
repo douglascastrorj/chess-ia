@@ -1,20 +1,12 @@
 
-
-
-// $('#startBtn').on('click', board.start)
-// $('#clearBtn').on('click', board.clear)
-
 var board;
 var chess;
-var tryMove;
 
 function startBoard() {
     chess = new Chess();
     board = Chessboard('board', {
         draggable: true,
         onDrop,
-        onChange
-
         // dropOffBoard: 'trash',
         // sparePieces: true
     })
@@ -22,38 +14,11 @@ function startBoard() {
 }
 
 
-
-function onChange(oldPos, newPos) {
-
-    // if(!tryMove) return;
-    // if(Chessboard.objToFen(oldPos) == Chessboard.objToFen(newPos)) return
-
-    // console.log('onChabnge', tryMove, newPos);
-
-    // console.log('is move possible ', isMovePossible(tryMove))
-
-    // if(isMovePossible(tryMove) == false) {
-    //     console.log('voltar para posicao original')
-    //     const oldPositionFen = Chessboard.objToFen(oldPos);
-    //     console.log(oldPos)
-    //     // board.position( oldPos )
-    //     // board.position({
-    //     //     a4: 'bK',
-    //     //     c4: 'wK',
-    //     //     a7: 'wR'
-    //     //   })
-
-    // } else {
-    //     // chess.move(move)
-    // }
-}
-
-
 function onDrop(source, target, piece, newPos, oldPos, orientation) {
 
     // console.log('Source: ' + source)
     // console.log('Target: ' + target)
-    // console.log('Piece: ' + piece)
+    console.log('Piece: ' + piece)
     // console.log('New position: ' + Chessboard.objToFen(newPos))
     // console.log('Old position: ' + Chessboard.objToFen(oldPos))
     // console.log('Orientation: ' + orientation)
@@ -61,14 +26,11 @@ function onDrop(source, target, piece, newPos, oldPos, orientation) {
     console.log('board.position ', board.position())
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
-    console.log('oldPos', oldPos)
-
 
     const move = getMove(piece, target);
 
-    tryMove = move;
-
-    if (isMovePossible(tryMove) == false) {
+    const isCorrectPiece = piece[0] == chess.turn();
+    if (isMovePossible(move) == false || isCorrectPiece == false) {
         console.log('voltar para posicao original')
 
         setTimeout(() => {
@@ -79,6 +41,7 @@ function onDrop(source, target, piece, newPos, oldPos, orientation) {
         chess.move(move)
     }
 
+    console.log(chess.moves())
 
 }
 
