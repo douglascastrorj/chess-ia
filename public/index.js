@@ -13,6 +13,10 @@ function startBoard() {
     board.start();
 }
 
+// falta validar movimentos de tomada de peça
+//falta validar movimentos do tipo que mais de uma peca igual ataca a mesma casa estando em mesma coluna ou mesma linha
+// Ex 'N5d4', 'N3d4' ou  Ned4, Ncd4  
+// o mesmo vale para tomadas
 
 function onDrop(source, target, piece, newPos, oldPos, orientation) {
 
