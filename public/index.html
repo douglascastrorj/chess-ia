@@ -19,13 +19,42 @@
 
     <link rel="stylesheet" href="index.css">
 
-    
+
 </head>
 
 <body onload="startBoard()">
 
     <script src="./index.js"></script>
-    <div id="board" style="width: 600px; height: 600px;"></div>
+
+    <div class="game">
+
+        <div class="board">
+            <div id="board" style="width: 400px;"></div>
+        </div>
+
+    </div>
+
+    <div class="status">
+    
+        <div>
+
+            <span>Status:</span>
+            <span id="status"></span>
+        </div>
+
+        <div>
+            <span>FEN:</span>
+            <span id="fen"></span>
+        </div>
+
+        <div>
+
+            <span>PGN:</span>
+            <span id="pgn"></span>
+        </div>
+
+    </div>
+
 
     <!-- <button id="startBtn">Start Position</button>
     <button id="clearBtn">Clear Board</button> -->

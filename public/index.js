@@ -1,61 +1,92 @@
 
-var board;
-var chess;
-
 function startBoard() {
-    chess = new Chess();
-    board = Chessboard('board', {
+
+    game = new Chess()
+    board = ChessBoard('board', {
         draggable: true,
-        onDrop,
-        // dropOffBoard: 'trash',
-        // sparePieces: true
+        position: 'start',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd
     })
     board.start();
+
+    $status = $('#status')
+    $pgn = $('#pgn')
+    $fen = $('#fen')
+
+    updateStatus()
+
 }
 
-// falta validar movimentos de tomada de peça
-//falta validar movimentos do tipo que mais de uma peca igual ataca a mesma casa estando em mesma coluna ou mesma linha
-// Ex 'N5d4', 'N3d4' ou  Ned4, Ncd4  
-// o mesmo vale para tomadas
+var board = null
+var game = null
+var $status
+var $fen
+var $pgn
 
-function onDrop(source, target, piece, newPos, oldPos, orientation) {
+function onDragStart(source, piece, position, orientation) {
+    // do not pick up pieces if the game is over
+    if (game.game_over()) return false
 
-    // console.log('Source: ' + source)
-    // console.log('Target: ' + target)
-    console.log('Piece: ' + piece)
-    // console.log('New position: ' + Chessboard.objToFen(newPos))
-    // console.log('Old position: ' + Chessboard.objToFen(oldPos))
-    // console.log('Orientation: ' + orientation)
+    // only pick up pieces for the side to move
+    if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return false
+    }
+}
 
-    console.log('board.position ', board.position())
-    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+function onDrop(source, target) {
+    // see if the move is legal
+    var move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // NOTE: always promote to a queen for example simplicity
+    })
 
+    // illegal move
+    if (move === null) return 'snapback'
 
-    const move = getMove(piece, target);
+    updateStatus()
+}
 
-    const isCorrectPiece = piece[0] == chess.turn();
-    if (isMovePossible(move) == false || isCorrectPiece == false) {
-        console.log('voltar para posicao original')
+// update the board position after the piece snap
+// for castling, en passant, pawn promotion
+function onSnapEnd() {
+    board.position(game.fen())
+}
 
-        setTimeout(() => {
-            board.position( {...oldPos} )
-        }, 50)
+function updateStatus() {
+    var status = ''
 
-    } else {
-        chess.move(move)
+    var moveColor = 'White'
+    if (game.turn() === 'b') {
+        moveColor = 'Black'
     }
 
-    console.log(chess.moves())
+    // checkmate?
+    if (game.in_checkmate()) {
+        status = 'Game over, ' + moveColor + ' is in checkmate.'
+    }
 
-}
+    // draw?
+    else if (game.in_draw()) {
+        status = 'Game over, drawn position'
+    }
 
+    // game still on
+    else {
+        status = moveColor + ' to move'
 
-function getMove(piece, target) {
-    const prefix = piece[1]
-    const move = `${prefix == 'P' ? '' : prefix}${target}`;
-    return move;
-}
+        // check?
+        if (game.in_check()) {
+            status += ', ' + moveColor + ' is in check'
+        }
+    }
 
-function isMovePossible(move) {
-    return chess.moves().includes(move);
+    console.log($status)
+
+    $status.html(status)
+    $fen.html(game.fen())
+    $pgn.html(game.pgn())
 }
