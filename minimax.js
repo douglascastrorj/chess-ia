@@ -20,8 +20,8 @@
 FIM ROTINA
  */
 
-// const { Chess } = require('./node_modules/chess.js');
-// const game = new Chess();
+const { Chess } = require('./node_modules/chess.js');
+const game = new Chess();
 
 function minimaxRoot({deep, game, maximizer, verbose}) {
 
@@ -130,9 +130,80 @@ function findBestMove() {
 }
 
 
-// game.move('e4')
-// console.log(game.ascii())
+// score = materialWeight * (numWhitePieces - numBlackPieces) * who2move 
+// where who2move = 1 for white, and who2move = -1 for black.
 
+
+
+
+var evaluateBoardNegaMax = function (game, sideToMaximize) {
+    // return Math.random()
+    const board = game.board();
+    var totalEvaluation = 0;
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            totalEvaluation = totalEvaluation + getPieceValueNegaMax(board[i][j], i ,j, sideToMaximize);
+        }
+    }
+    return totalEvaluation;
+};
+
+
+function getPieceValueNegaMax(piece, x, y, sideToMaximize) {
+    if (piece === null) {
+        return 0;
+    }
+    var getAbsoluteValue = function (piece) {
+        if (piece.type === 'p') {
+            return 10;
+        } else if (piece.type === 'r') {
+            return 50;
+        } else if (piece.type === 'n') {
+            return 30;
+        } else if (piece.type === 'b') {
+            return 30;
+        } else if (piece.type === 'q') {
+            return 90;
+        } else if (piece.type === 'k') {
+            return 900;
+        }
+        throw "Unknown piece type: " + piece.type;
+    };
+
+    var absoluteValue = getAbsoluteValue(piece);
+    return piece.color === sideToMaximize ? absoluteValue : -absoluteValue;
+};
+
+var negaMaxBestMove = {depth: -1};
+function negaMax( {game, depth, sideToMaximize} ) {
+    if ( depth == 0 ) return evaluateBoardNegaMax(game, sideToMaximize);
+    let max = -Infinity;
+    for ( let move of game.moves())  {
+        game.move(move);
+        let score = -negaMax( {game, depth: depth - 1, sideToMaximize} );
+        game.undo();
+
+        if( score > max ){
+            max = score;
+            if(depth > negaMaxBestMove.depth) {
+                negaMaxBestMove = {move, depth}
+            }
+            // console.log(move)
+            // console.log(depth)
+        }
+    }
+    return max;
+}
+
+
+
+game.move('e4')
+game.move('Nc6')
+game.move('d4')
+console.log(game.ascii())
+
+negaMax({game, depth: 3, sideToMaximize: 'b'})
+console.log(negaMaxBestMove)
 // const bestMove = minimaxRoot({game, deep:5, maximizer: true, verbose: false});
 
 // console.log(game.ascii())
