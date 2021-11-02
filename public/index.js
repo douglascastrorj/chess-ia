@@ -62,6 +62,11 @@ function updateStatus() {
     var moveColor = 'White'
     if (game.turn() === 'b') {
         moveColor = 'Black'
+
+        setTimeout(function() {
+            game.move(findBestMove({deep: 3}))
+            board.position(game.fen())
+        }, 100)
     }
 
     // checkmate?

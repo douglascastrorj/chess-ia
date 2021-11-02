@@ -20,8 +20,8 @@
 FIM ROTINA
  */
 
-const { Chess } = require('./node_modules/chess.js');
-const game = new Chess();
+// const { Chess } = require('./node_modules/chess.js');
+// const game = new Chess();
 
 function minimaxRoot({deep, game, maximizer, verbose}) {
 
@@ -124,9 +124,16 @@ function getPieceValue(piece, x, y) {
     return piece.color === 'w' ? absoluteValue : -absoluteValue;
 };
 
-console.log(game.ascii())
+function findBestMove() {
+    const bestMove = minimaxRoot({game, deep:5, maximizer: true, verbose: false});
+    return
+}
 
-const bestMove = minimaxRoot({game, deep:5, maximizer: true, verbose: false});
 
-console.log(game.ascii())
-console.log(`Best Move: ${bestMove}`);
+// game.move('e4')
+// console.log(game.ascii())
+
+// const bestMove = minimaxRoot({game, deep:5, maximizer: true, verbose: false});
+
+// console.log(game.ascii())
+// console.log(`Best Move: ${bestMove}`);
