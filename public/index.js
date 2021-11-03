@@ -1,12 +1,14 @@
 
-let $status,  $fen
+var $status,  $fen;
+var board, game;
+
 function startBoard() {
 
 
-    $status = $('#status')
-    $fen = $('#fen')
+    $status = $('#status');
+    $fen = $('#fen');
 
-    game = new Chess()
+    game = new Chess();
 
     var cfg = {
         draggable: true,
@@ -25,8 +27,6 @@ function startBoard() {
 
 }
 
-var board,
-    game;
 
 
 /* board visualization and games state handling */
