@@ -27,54 +27,61 @@
     <script src="./minimax.js"></script>
     <script src="./index.js"></script>
 
-    <div class="game">
+    <main>
 
-        <div class="board">
-            <div id="board" style="width: 400px;"></div>
-        </div>
 
-    </div>
 
-    <div class="status">
-    
-        <div>
+        <div class="game">
 
-            <span>Status:</span>
-            <span id="status"></span>
-        </div>
-
-        <div>
-            <span>FEN:</span>
-            <span id="fen"></span>
-        </div>
-
-        <div class="info">
-            Search depth:
-            <select id="search-depth">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" selected>3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
-        
-            <br>
-            <span>Positions evaluated: <span id="position-count"></span></span>
-            <br>
-            <span>Time: <span id="time"></span></span>
-            <br>
-            <span>Positions/s: <span id="positions-per-s"></span> </span>
-            <br>
-            <br>
-            <div id="move-history" class="move-history">
+            <div class="board">
+                <div id="board" style="width: 400px;"></div>
             </div>
+
         </div>
 
-    </div>
+        <div class="status">
 
-    
+            <div>
+
+                <span>Status:</span>
+                <span id="status"></span>
+            </div>
+
+            <div>
+                <span>FEN:</span>
+                <span id="fen"></span>
+            </div>
+
+            <div class="info">
+                Search depth:
+                <select id="search-depth">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <br>
+                <span>Positions evaluated: <span id="position-count"></span></span>
+                <br>
+                <span>Time: <span id="time"></span></span>
+                <br>
+                <span>Positions/s: <span id="positions-per-s"></span> </span>
+                <br>
+                <br>
+                <div id="move-history" class="move-history">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="btn" onclick="restart()" id="restartBtn" style="display: flex;">
+            Recomeçar
+        </div>
 
 
+    </main>
     <!-- <button id="startBtn">Start Position</button>
     <button id="clearBtn">Clear Board</button> -->
 </body>

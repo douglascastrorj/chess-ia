@@ -4,14 +4,16 @@
     box-sizing: border-box;
 }
 
-body {
+main {
     background-color: #444;
     display: flex;
     justify-content: center;
     align-items: center;
-    
+    flex-direction: column;
+    gap: 20px;
     
     height: 100vh;
+
 }
 
 .game {
@@ -42,7 +44,17 @@ body {
 
 
 
+.btn {
+  background-color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
+.btn:hover {
+  background-color: #aeaeae;
+}
 
 
 

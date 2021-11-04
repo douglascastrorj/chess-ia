@@ -44,7 +44,8 @@ var makeBestMove = function () {
     board.position(game.fen());
     renderMoveHistory(game.history());
     if (game.game_over()) {
-        alert('Game over');
+        // alert('Game over');
+        $('#restartBtn').css('display', 'flex')
     }
 };
 
@@ -52,7 +53,8 @@ var makeBestMove = function () {
 var positionCount;
 var getBestMove = function (game) {
     if (game.game_over()) {
-        alert('Game over');
+        // alert('Game over');
+        $('#restartBtn').css('display', 'flex')
     }
 
     positionCount = 0;
@@ -135,3 +137,10 @@ var greySquare = function (square) {
     squareEl.css('background', background);
 };
 
+
+function restart() {
+    // $('#restartBtn').css('display', 'none')
+
+    game.reset();
+    board.position(game.fen());
+}

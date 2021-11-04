@@ -1,7 +1,7 @@
 /*The "AI" part starts here */
 
 
-// order moves to improve alpha-beta pruning ( mate check captures other_moves  )
+// order moves to improve alpha-beta pruning ( mate check captures other_moves  )  - DONE
 
 
 // endgame force enemy king to corner
@@ -12,9 +12,10 @@ function getOrderMoves(game) {
 
     const mateMoves = moves.filter(move => move.includes('#'))
     const capturesMoves = moves.filter(move => move.includes('x'))
+    const checkMoves = moves.filter( move => move.includes('+'))
     const other = moves.filter(move => !move.includes('#') && !move.includes('+') && !move.includes('x'))
 
-    return [...mateMoves, ...capturesMoves, ...other];
+    return [...mateMoves, ...capturesMoves, ...checkMoves, ...other];
 }
 
 
