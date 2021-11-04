@@ -40,7 +40,7 @@ var minimaxRoot = function (depth, game, isMaximisingPlayer) {
 
 var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     positionCount++;
-    if (depth === 0) {
+    if (depth <= 0) {
         return -evaluateBoard(game);
     }
 
@@ -50,6 +50,7 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         var bestMove = -9999;
         for (var i = 0; i < newGameMoves.length; i++) {
             game.move(newGameMoves[i]);
+            // const newDepth = newGameMoves[i].includes('x') || newGameMoves[i].includes('+') ? depth - 0.3 : depth - 1
             bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
             game.undo();
             alpha = Math.max(alpha, bestMove);
@@ -79,6 +80,8 @@ var evaluateBoard = function (game) {
     if(game.in_checkmate()) {
         return game.turn() == 'w' ? 9999 : -9999;
     }
+    
+    if(game.in_draw()) return 0;
 
     const material = materialEvaluation(board);
     const position = positionEvaluation(board);
@@ -104,6 +107,7 @@ function positionEvaluation(board) {
         for (var j = 0; j < 8; j++) {
             const piece = board[i][j];
             if (piece) {
+
                 const pieceInfo = {
                     ...piece,
                     i,
@@ -116,25 +120,54 @@ function positionEvaluation(board) {
         }
     }
 
-    const isEarlyGame = blackPieces.length + whitePieces.length >= 22;
+    const blackPiecesCount = blackPieces.map(piece => getPieceValue(piece)).reduce( (previous, cur) => previous + cur, 0);
+    const whitePiecesCount = whitePieces.map(piece => getPieceValue(piece)).reduce( (previous, cur) => previous + cur, 0);
 
+    let gameState = 'early'
+    const maxScore = 39;
+    
     for (let piece of blackPieces) {
-        totalEvaluation += -Math.abs(getSquareTableValue(piece, isEarlyGame));
+
+        if( Math.abs(blackPiecesCount) > 930) gameState = 'early'
+        if( Math.abs(blackPiecesCount) > 925 && Math.abs(blackPiecesCount) < 930) gameState = 'middle'
+        if(Math.abs(blackPiecesCount) < 910) gameState = 'end'
+
+        totalEvaluation += getSquareTableValue(piece, gameState)
     }
 
     for (let piece of whitePieces) {
-        totalEvaluation += Math.abs(getSquareTableValue(piece, isEarlyGame));
+        if( whitePiecesCount > 930) gameState = 'early'
+        if( whitePiecesCount > 925 && whitePiecesCount < 930) gameState = 'middle'
+        if(whitePiecesCount < 910) gameState = 'end'
+
+        totalEvaluation += getSquareTableValue(piece, gameState)
     }
 
     return totalEvaluation;
 }
 
-function getSquareTableValue(piece, isEarlyGame) {
-    const center = 4.5;
+function getSquareTableValue(piece, gameState) {
 
+    const alpha = piece.color == 'w' ? 1 : -1;
+    const center = 4.5;
     const distanceFromCenter = (x) => Math.abs(x - center);
 
-    return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j))
+    if(gameState == 'early') {
+        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j))
+    } else if( gameState == 'middle') {
+        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j))
+    } else {
+        // 
+        if(piece.type == 'k') {
+            const dist = distanceFromCenter(piece.i) + distanceFromCenter(piece.j)
+            return 20 * dist * -alpha;
+        }
+        else if(piece.type == 'p') {
+            const dist = 2*distanceFromCenter(piece.i)
+            return 20 * dist * alpha;
+        }
+        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j)) * alpha
+    }
     // if (piece.type === 'p') {
     //     if( isEarlyGame ) return 100/distanceFromCenter(piece.i) + 100/distanceFromCenter(piece.j)
     //     else return 100 / (Math.abs(piece.i - 4) + Math.abs(piece.i - 4));
