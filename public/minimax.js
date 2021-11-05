@@ -58,6 +58,8 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
 
     var newGameMoves = getOrderMoves(game);
 
+    if(game.in_stalemate()) return 0; 
+
     if (isMaximisingPlayer) {
         var bestMove = -Infinity;
         for (var i = 0; i < newGameMoves.length; i++) {
