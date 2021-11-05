@@ -62,16 +62,35 @@ main {
 
 
 @media (max-width: 1300px) {
-  .status {
+  .status,
+  .config {
     display: none;
   }
 }
 
 
 
+.config {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
 
+  margin-top: 10px;
+}
 
+.config-section {
+  border-bottom: solid 1px #eee;
+}
+
+.config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 200px;
+
+  padding: 10px;
+}
 
 
 

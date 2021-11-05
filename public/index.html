@@ -43,13 +43,13 @@
 
             <div>
 
-                <span>Status:</span>
-                <span id="status"></span>
+                <span style="font-size: 24px;">Status:</span>
+                <span id="status" style="font-size: 24px;"></span>
             </div>
 
             <div>
                 <span>FEN:</span>
-                <span id="fen"></span>
+                <span id="fen"> - </span>
             </div>
 
             <div class="info">
@@ -62,12 +62,68 @@
                     <option value="5">5</option>
                 </select>
 
+                <div class="config">
+
+                    <div class="config-section">
+                        <h3 style="margin-bottom: 10px"> Position Select </h3>
+                        <select id="position-select" onchange="changePosition()">
+                            <option value="start" selected> Start</option>
+                            <option value="ruyLopez"> Ruy Lopez </option>
+                            <option value="sicilian"> Sicilian Defense </option>
+                            <option value="endGame"> End Game</option>
+                        </select>
+                        <br>
+                        <br>
+                    </div>
+
+                    <div class="config-section">
+                        <h3 style="margin-bottom: 10px"> Openning </h3>
+                        <div class="config-item">
+                            <label for=""> Material weight </label>
+                            <input id="openning-material" type="range" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="config-item">
+                            <label for=""> Position weight </label>
+                            <input id="openning-position" type="range" min="0" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3 style="margin-bottom: 10px"> Mid Game </h3>
+                        <div class="config-item">
+                            <label for=""> Material weight </label>
+                            <input id="mid-material" type="range" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="config-item">
+                            <label for=""> Position weight </label>
+                            <input id="mid-position" type="range" min="0" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3 style="margin-bottom: 10px"> End Game </h3>
+                        <div class="config-item">
+                            <label for=""> Material weight </label>
+                            <input id="end-material" type="range" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="config-item">
+                            <label for=""> Position weight </label>
+                            <input id="end-position" type="range" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+
                 <br>
-                <span>Positions evaluated: <span id="position-count"></span></span>
+                <h3> Debug Info: </h3>
                 <br>
-                <span>Time: <span id="time"></span></span>
+                <span>Positions evaluated: <span id="position-count">-</span></span>
                 <br>
-                <span>Positions/s: <span id="positions-per-s"></span> </span>
+                <span>Time: <span id="time">-</span></span>
+                <br>
+                <span>Positions/s: <span id="positions-per-s">-</span> </span>
                 <br>
                 <br>
                 <div id="move-history" class="move-history">

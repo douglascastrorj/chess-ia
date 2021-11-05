@@ -9,6 +9,30 @@
 
 let ia_side = 'b'
 
+
+let _CONFIG = {
+    opening: {
+        materialWeight: 1,
+        positionWeight: 0.5,
+        wKingDistCenter: 100,
+        kingsDistance: 800
+    },
+    middleGame: {
+        materialWeight: 1,
+        positionWeight: 0.5,
+        wKingDistCenter: 100,
+        kingsDistance: 800
+    },
+    endGame: {
+        materialWeight: 1,
+        positionWeight: 0.5,
+        kingDistance: 160,
+        wKingDistCenter: 100,
+        kingsDistance: 800
+    }
+}
+
+
 function getOrderMoves(game) {
     const moves = game.moves();
 
@@ -216,12 +240,12 @@ var getPieceValue = function (piece) {
 
 const BishopTable = [
     [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, -20, -10, -10, -10, -10, -20, 0],
+    [0, -30, -20, -20, -20, -20, -30, 0],
+    [0, -40, -30, -20, -20, -30, -40, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, -20, -20, -20, -20, -20, -20, 0],
+    [0, -30, -30, -30, -30, -30, -30, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
 ];
 

@@ -6,7 +6,7 @@ var board, game;
 
 // const endgameFen = 'r5k1/8/4p3/p7/5K2/8/4p3/8 w - - 8 60'
 // const endgameFen = '3K2k1/r7/7b/8/6n1/8/8/8 w - - 22 58'
-const endgameFen = '6k1/r7/8/3K4/8/8/8/8 w - - 22 58'
+const endgameFen = '6k1/p7/8/3K4/8/8/8/8 w - - 22 58'
 
 function startBoard() {
 
@@ -14,11 +14,11 @@ function startBoard() {
     $status = $('#status');
     $fen = $('#fen');
 
-    game = new Chess(endgameFen);
+    game = new Chess();
 
     var cfg = {
         draggable: true,
-        position: endgameFen, //'start',
+        position: 'start',
         onDragStart: onDragStart,
         onDrop: onDrop,
         onMouseoutSquare: onMouseoutSquare,
@@ -163,4 +163,31 @@ function undo() {
 
     game.undo();
     board.position(game.fen());
+}
+
+function changePosition() {
+    const ruyLopez = 'r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4'
+    const sicilian = 'r1bqkbnr/pp2pppp/2np4/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4'
+    const endgameFen = '6k1/q7/8/3K4/8/8/8/8 w - - 22 58'
+
+    const position = $('#position-select').find(':selected').val()
+
+    switch(position) {
+        case 'start':
+            restart();
+            break
+        case 'ruyLopez':
+            game.load(ruyLopez)
+            board.position(game.fen())
+            break
+        case 'sicilian':
+            game.load(sicilian)
+            board.position(game.fen())
+            break
+        case 'endGame':
+            game.load(endgameFen)
+            board.position(game.fen())
+            break
+    }
+
 }
