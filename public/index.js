@@ -4,7 +4,7 @@ var board, game;
 
 
 
-const endgameFen = 'q5k1/8/2p5/p7/5K2/8/4r3/8 w - - 8 60'
+const endgameFen = 'r5k1/8/4p3/p7/5K2/8/4p3/8 w - - 8 60'
 
 function startBoard() {
 
@@ -25,6 +25,12 @@ function startBoard() {
         onChange: () => {
             $status.html(game.turn() == 'w' ? 'White to play' : 'Black to play')
             $fen.html(game.fen())
+
+            if(game.in_checkmate()) {
+                setTimeout(()=> {
+                    alert(`${game.turn() == 'w' ? 'Black' : 'White'} wins`)
+                }, 300);
+            }
         }
     };
     board = ChessBoard('board', cfg);
