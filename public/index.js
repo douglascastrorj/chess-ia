@@ -4,7 +4,9 @@ var board, game;
 
 
 
-const endgameFen = 'r5k1/8/4p3/p7/5K2/8/4p3/8 w - - 8 60'
+// const endgameFen = 'r5k1/8/4p3/p7/5K2/8/4p3/8 w - - 8 60'
+// const endgameFen = '3K2k1/r7/7b/8/6n1/8/8/8 w - - 22 58'
+const endgameFen = '6k1/r7/8/3K4/8/8/8/8 w - - 22 58'
 
 function startBoard() {
 

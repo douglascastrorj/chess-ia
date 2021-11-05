@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+body {
+  height: 100vh;
+}
+
 main {
     background-color: #444;
     display: flex;

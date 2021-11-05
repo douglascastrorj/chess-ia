@@ -31,9 +31,6 @@ var minimaxRoot = function (depth, game, isMaximisingPlayer) {
         var newGameMove = newGameMoves[i]
         game.move(newGameMove);
         var value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
-
-        console.log(value, bestMove);
-
         game.undo();
         if (value >= bestMove) {
             bestMove = value;
@@ -130,7 +127,7 @@ function positionEvaluation(game) {
 
             const kingsDistance = pieceDistance(wKing, bKing);
 
-            score +=  wKingDistCenter * -10 +  (-160 / kingsDistance);
+            score +=  wKingDistCenter * -100 +  (-800 / kingsDistance);
 
         }
     }
