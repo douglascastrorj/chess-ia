@@ -2,17 +2,21 @@
 var $status,  $fen;
 var board, game;
 
+
+
+const endgameFen = 'q5k1/8/2p5/p7/5K2/8/4r3/8 w - - 8 60'
+
 function startBoard() {
 
 
     $status = $('#status');
     $fen = $('#fen');
 
-    game = new Chess();
+    game = new Chess(endgameFen);
 
     var cfg = {
         draggable: true,
-        position: 'start',
+        position: endgameFen, //'start',
         onDragStart: onDragStart,
         onDrop: onDrop,
         onMouseoutSquare: onMouseoutSquare,
@@ -142,5 +146,13 @@ function restart() {
     // $('#restartBtn').css('display', 'none')
 
     game.reset();
+    board.position(game.fen());
+}
+
+function undo() {
+    game.undo();
+    board.position(game.fen());
+
+    game.undo();
     board.position(game.fen());
 }

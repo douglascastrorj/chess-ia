@@ -7,6 +7,8 @@
 // endgame force enemy king to corner
 // endgame encourage king to move next to enemy king
 
+let ia_side = 'b'
+
 function getOrderMoves(game) {
     const moves = game.moves();
 
@@ -22,13 +24,16 @@ function getOrderMoves(game) {
 var minimaxRoot = function (depth, game, isMaximisingPlayer) {
 
     var newGameMoves = getOrderMoves(game)
-    var bestMove = -9999;
+    var bestMove = -Infinity;
     var bestMoveFound;
 
     for (var i = 0; i < newGameMoves.length; i++) {
         var newGameMove = newGameMoves[i]
         game.move(newGameMove);
         var value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+
+        console.log(value, bestMove);
+
         game.undo();
         if (value >= bestMove) {
             bestMove = value;
@@ -40,18 +45,26 @@ var minimaxRoot = function (depth, game, isMaximisingPlayer) {
 
 var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     positionCount++;
-    if (depth <= 0) {
-        return -evaluateBoard(game);
+    if (depth === 0) {
+        const val = -evaluateBoard(game);
+
+        if(game.in_checkmate()) {
+
+            console.log(val)
+            console.log(game.ascii())
+        }
+        return val;
     }
 
     var newGameMoves = getOrderMoves(game);
 
     if (isMaximisingPlayer) {
-        var bestMove = -9999;
+        var bestMove = -Infinity;
         for (var i = 0; i < newGameMoves.length; i++) {
             game.move(newGameMoves[i]);
             // const newDepth = newGameMoves[i].includes('x') || newGameMoves[i].includes('+') ? depth - 0.3 : depth - 1
-            bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+            const move =  minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer)
+            bestMove = Math.max(bestMove, move);
             game.undo();
             alpha = Math.max(alpha, bestMove);
             if (beta <= alpha) {
@@ -60,10 +73,11 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
         }
         return bestMove;
     } else {
-        var bestMove = 9999;
+        var bestMove = Infinity;
         for (var i = 0; i < newGameMoves.length; i++) {
             game.move(newGameMoves[i]);
-            bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+            const move = minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer);
+            bestMove = Math.min(bestMove, move);
             game.undo();
             beta = Math.min(beta, bestMove);
             if (beta <= alpha) {
@@ -75,118 +89,105 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
 };
 
 var evaluateBoard = function (game) {
-    const board = game.board();
-
-    if(game.in_checkmate()) {
-        return game.turn() == 'w' ? 9999 : -9999;
-    }
     
-    if(game.in_draw()) return 0;
 
-    const material = materialEvaluation(board);
-    const position = positionEvaluation(board);
+    const material = materialEvaluation(game);
+    const position = positionEvaluation(game);
 
     return material + position;
 };
 
-function materialEvaluation(board) {
+function materialEvaluation(game) {
+    const board = game.board();
     var totalEvaluation = 0;
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
-            totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i, j);
+            totalEvaluation = totalEvaluation + getPieceValue(board[i][j]);
         }
     }
     return totalEvaluation;
 }
 
-function positionEvaluation(board) {
-    let blackPieces = []
-    let whitePieces = []
-    var totalEvaluation = 0;
-    for (var i = 0; i < 8; i++) {
-        for (var j = 0; j < 8; j++) {
-            const piece = board[i][j];
-            if (piece) {
+function positionEvaluation(game) {
+    const pieces = getPieces(game.board());
 
-                const pieceInfo = {
-                    ...piece,
-                    i,
-                    j
-                };
-
-                if (piece.color == 'b') blackPieces.push(pieceInfo)
-                else whitePieces.push(pieceInfo)
-            }
-        }
-    }
-
-    const blackPiecesCount = blackPieces.map(piece => getPieceValue(piece)).reduce( (previous, cur) => previous + cur, 0);
-    const whitePiecesCount = whitePieces.map(piece => getPieceValue(piece)).reduce( (previous, cur) => previous + cur, 0);
-
-    let gameState = 'early'
-    const maxScore = 39;
-    
-    for (let piece of blackPieces) {
-
-        if( Math.abs(blackPiecesCount) > 930) gameState = 'early'
-        if( Math.abs(blackPiecesCount) > 925 && Math.abs(blackPiecesCount) < 930) gameState = 'middle'
-        if(Math.abs(blackPiecesCount) < 910) gameState = 'end'
-
-        totalEvaluation += getSquareTableValue(piece, gameState)
-    }
-
-    for (let piece of whitePieces) {
-        if( whitePiecesCount > 930) gameState = 'early'
-        if( whitePiecesCount > 925 && whitePiecesCount < 930) gameState = 'middle'
-        if(whitePiecesCount < 910) gameState = 'end'
-
-        totalEvaluation += getSquareTableValue(piece, gameState)
-    }
-
-    return totalEvaluation;
-}
-
-function getSquareTableValue(piece, gameState) {
-
-    const alpha = piece.color == 'w' ? 1 : -1;
-    const center = 4.5;
-    const distanceFromCenter = (x) => Math.abs(x - center);
-
-    if(gameState == 'early') {
-        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j))
-    } else if( gameState == 'middle') {
-        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j))
+    let score = 0;
+    if(game.in_checkmate() ) {
+        if(game.turn() !== ia_side) return  -9999;
+        else return 9999;
     } else {
-        // 
-        if(piece.type == 'k') {
-            const dist = distanceFromCenter(piece.i) + distanceFromCenter(piece.j)
-            return 20 * dist * -alpha;
+
+        if(game.in_stalemate()) return 0;
+        
+        if(pieces.length <= 10) {
+            const wKing = pieces.find( piece => piece.type == 'k' && piece.color == 'w');
+            const bKing = pieces.find( piece => piece.type == 'k' && piece.color == 'b');
+
+            const wKingDistCenter = distanceToCenter(wKing);
+            const bKingDistCenter = distanceToCenter(bKing);
+
+            const kingsDistance = pieceDistance(wKing, bKing);
+
+            score +=  wKingDistCenter * -10 +  (-160 / kingsDistance);
+
         }
-        else if(piece.type == 'p') {
-            const dist = 2*distanceFromCenter(piece.i)
-            return 20 * dist * alpha;
-        }
-        return 10 / (distanceFromCenter(piece.i) + distanceFromCenter(piece.j)) * alpha
     }
-    // if (piece.type === 'p') {
-    //     if( isEarlyGame ) return 100/distanceFromCenter(piece.i) + 100/distanceFromCenter(piece.j)
-    //     else return 100 / (Math.abs(piece.i - 4) + Math.abs(piece.i - 4));
-    // } else if (piece.type === 'r') {
-    //     return 0
-    // } else if (piece.type === 'n') {
-    //     return 100 * (Math.abs(piece.i - 4) + Math.abs(piece.i - 4));
-    // } else if (piece.type === 'b') {
-    //     return 0
-    // } else if (piece.type === 'q') {
-    //     return 0
-    // } else if (piece.type === 'k') {
-    //     if(isEarlyGame) return 0
-    //     else return 0
-    // }
+
+    const squareValuesArr = pieces.map(piece => getSquareTable(piece, pieces.length <= 10 ? 'end' : 'early')[piece.i][piece.j]);
+    const squareValues = squareValuesArr.reduce((prev, cur) => cur + prev, 0);
+
+    return score + squareValues / 5;
+}
+
+function getPieces(board) {
+    let pieces = [];
+
+    for(let i = 0; i < board.length; i++) {
+        for(let j = 0; j < board.length; j++) {
+            const piece = {...board[i][j], i, j };
+            if(board[i][j]) pieces.push(piece)
+        }   
+    }
+
+    return pieces;
+}
+
+function distanceToCenter(piece) {
+    return Math.abs( 8 - piece.i) + Math.abs(8 - piece.j);
+}
+
+function pieceDistance(a, b) {
+    return Math.abs( b.i - a.i) + Math.abs(b.j - a.j);
+}
+
+function getSquareTable(piece, gameState) {
+    let table;
+    if (piece.type === 'p') {
+        if(gameState == 'end') table = PawnTableEndGame;
+        return table = PawnTable;
+    } else if (piece.type === 'r') {
+        table = RookTable
+    } else if (piece.type === 'n') {
+        table = KnightTable;
+    } else if (piece.type === 'b') {
+        table = BishopTable
+    } else if (piece.type === 'q') {
+        table = QueenTable
+    } else if (piece.type === 'k') {
+        if(gameState == 'end') table = KingEndGameTable
+        table = KingMiddleGameTable
+    }
+
+    table = JSON.parse(JSON.stringify(table));
+
+    if(piece.color == 'w') return table;
+    else {
+        return table.reverse().map( row => row.map(col => col * -1))
+    }
 }
 
 
-var getPieceValue = function (piece, x, y) {
+var getPieceValue = function (piece) {
     if (piece === null) {
         return 0;
     }
@@ -246,56 +247,56 @@ const KingMiddleGameTable = [
 ]
 
 const KnightTable = [
-    [-20, -80, -60, -60, -60, -60, -80, -20],
-    [-80, -40, 0, 0, 0, 0, -40, -80],
-    [-60, 0, 20, 30, 30, 20, 0, -60],
-    [-60, 10, 30, 40, 40, 30, 10, -60],
-    [-60, 0, 30, 40, 40, 30, 0, -60],
-    [-60, 10, 20, 30, 30, 30, 1, -60],
-    [-80, -40, 0, 10, 10, 0, -4, -80],
-    [-20, -80, -60, -60, -60, -60, -80, -20],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [15, 20, 25, 30, 30, 25, 20, 15],
+    [10, 15, 20, 25, 25, 20, 15, 10],
+    [5, 10, 15, 20, 20, 15, 10, 5],
+    [0, 5, 10, 15, 15, 10, 5, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 const PawnTable = [
-    [9000, 9000, 9000, 9000, 9000, 9000, 9000, 9000],
-    [200, 200, 200, 200, 200, 200, 200, 200],
-    [100, 100, 100, 100, 100, 100, 100, 100],
-    [40, 40, 90, 100, 100, 90, 40, 40],
-    [20, 20, 20, 100, 150, 20, 20, 20],
-    [2, 4, 0, 15, 4, 0, 4, 2],
-    [-10, -10, -10, -20, -35, -10, -10, -10],
-    [0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 5, 10, 10, 5, 0, 0],
+    [0, 10, 30, 50, 50, 30, 0 , 0],
+    [0, 10, 20, 40, 40, 10, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 const PawnTableEndGame = [
-    [9000, 9000, 9000, 9000, 9000, 9000, 9000, 9000],
-    [500, 500, 500, 500, 500, 500, 500, 500],
-    [300, 300, 300, 300, 300, 300, 300, 300],
-    [90, 90, 90, 100, 100, 90, 90, 90],
-    [70, 70, 70, 85, 85, 70, 70, 70],
-    [20, 20, 20, 20, 20, 20, 20, 20],
-    [-10, -10, -10, -10, -10, -10, -10, -10],
-    [0, 0, 0, 0, 0, 0, 0, 0]
+    [100, 100, 100, 100, 100, 100, 100, 100],
+    [80, 80, 80, 80, 80, 80, 80, 80],
+    [60, 60, 60, 60, 60, 60, 60, 60],
+    [50, 50, 50, 50, 50, 50, 50, 50],
+    [40, 40, 40, 40, 40, 40, 40, 40],
+    [20, 20, 20, 30, 30, 20, 20, 20],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 const QueenTable = [
-    [-40, -20, -20, -10, -10, -20, -20, -40],
-    [-20, 0, 0, 0, 0, 0, 0, -20],
-    [-20, 0, 10, 10, 10, 10, 0, -20],
-    [-10, 0, 10, 10, 10, 10, 0, -10],
-    [0, 0, 10, 10, 10, 10, 0, -10],
-    [-20, 10, 10, 10, 10, 10, 0, -20],
-    [-20, 0, 10, 0, 0, 0, 0, -20],
-    [-40, -20, -20, -10, -10, -20, -20, -40]
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 10, 10, 10, 10, 0, 0],
+    [0, 0, 10, 10, 10, 10, 0, 0],
+    [0, 0, 0, 10, 10, 0, 0, 0],
 ]
 
 const RookTable = [
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [10, 20, 20, 20, 20, 20, 20, 10],
-    [-10, 0, 0, 0, 0, 0, 0, -10],
-    [-10, 0, 0, 0, 0, 0, 0, -10],
-    [-10, 0, 0, 0, 0, 0, 0, -10],
-    [-10, 0, 0, 0, 0, 0, 0, -10],
-    [-10, 0, 0, 0, 0, 0, 0, -10],
-    [-30, 30, 40, 10, 10, 0, 0, -30]
+    [30, 30, 30, 30, 30, 30, 30, 30],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [10, 10, 10, 10, 10, 10, 10, 10],
 ]
