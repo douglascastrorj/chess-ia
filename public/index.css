@@ -93,6 +93,10 @@ main {
 }
 
 
+select {
+  padding: 4px 5px;
+}
+
 
 .board {
     width: 400px;
