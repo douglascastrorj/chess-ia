@@ -57,7 +57,11 @@ main {
 }
 
 
-
+@media (max-width: 1300px) {
+  .status {
+    display: none;
+  }
+}
 
 
 
