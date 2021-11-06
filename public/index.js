@@ -191,3 +191,18 @@ function changePosition() {
     }
 
 }
+
+$('input[type=range]').on('input', function () {
+    $(this).trigger('change');
+});
+
+$(document).ready(function(){
+    $("[type=range]").change(function(){
+
+      var newVal= parseFloat($(this).val());
+      
+      const configPath = this.id.split('-');
+      _CONFIG[configPath[0]][configPath[1]] = newVal;
+
+    });
+  });

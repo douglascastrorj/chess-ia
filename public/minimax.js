@@ -12,22 +12,22 @@ let ia_side = 'b'
 
 let _CONFIG = {
     opening: {
-        materialWeight: 1,
-        positionWeight: 0.5,
-        wKingDistCenter: 100,
+        materialWeight: 50, 
+        positionWeight: 13,
+        kingDistCenter: 100,
         kingsDistance: 800
     },
     middleGame: {
-        materialWeight: 1,
-        positionWeight: 0.5,
-        wKingDistCenter: 100,
+        materialWeight: 50,
+        positionWeight: 50,
+        kingDistCenter: 100,
         kingsDistance: 800
     },
     endGame: {
-        materialWeight: 1,
-        positionWeight: 0.5,
+        materialWeight: 50,
+        positionWeight: 50,
         kingDistance: 160,
-        wKingDistCenter: 100,
+        kingDistCenter: 100,
         kingsDistance: 800
     }
 }
@@ -69,11 +69,11 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     if (depth === 0) {
         const val = -evaluateBoard(game);
 
-        if(game.in_checkmate()) {
+        // if(game.in_checkmate()) {
 
-            console.log(val)
-            console.log(game.ascii())
-        }
+        //     console.log(val)
+        //     console.log(game.ascii())
+        // }
         return val;
     }
 
@@ -113,11 +113,17 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
 
 var evaluateBoard = function (game) {
     
+    const pieces = getPieces(game.board());
 
     const material = materialEvaluation(game);
-    const position = positionEvaluation(game);
+    const position = positionEvaluation(game, pieces);
 
-    return material + position / 3;
+    const  gameState = getGameState(pieces);
+
+    const materialWeight = _CONFIG[gameState].materialWeight
+    const positionWeight = _CONFIG[gameState].positionWeight
+
+    return (material * materialWeight) + (position * positionWeight);
 };
 
 function materialEvaluation(game) {
@@ -131,8 +137,7 @@ function materialEvaluation(game) {
     return totalEvaluation;
 }
 
-function positionEvaluation(game) {
-    const pieces = getPieces(game.board());
+function positionEvaluation(game, pieces) {
 
     let score = 0;
     if(game.in_checkmate() ) {
@@ -140,7 +145,7 @@ function positionEvaluation(game) {
         else return 9999;
     } else {
 
-        if(game.in_stalemate()) return 0;
+        if(game.in_draw()) return 0;
         
         if(pieces.length <= 10) {
             const wKing = pieces.find( piece => piece.type == 'k' && piece.color == 'w');
@@ -156,10 +161,16 @@ function positionEvaluation(game) {
         }
     }
 
-    const squareValuesArr = pieces.map(piece => getSquareTable(piece, pieces.length <= 10 ? 'end' : 'early')[piece.i][piece.j]);
+    const squareValuesArr = pieces.map(piece => getSquareTable(piece, getGameState(pieces))[piece.i][piece.j]);
     const squareValues = squareValuesArr.reduce((prev, cur) => cur + prev, 0);
 
     return score + squareValues;
+}
+
+function getGameState(pieces) {
+    if(pieces.length >= 26 ) return 'opening'
+    if(pieces.length > 15 && pieces.length < 26) return 'middleGame'
+    return 'endGame';
 }
 
 function getPieces(board) {
@@ -186,20 +197,20 @@ function pieceDistance(a, b) {
 function getSquareTable(piece, gameState) {
     let table;
     if (piece.type === 'p') {
-        if(gameState == 'end') table = PawnTableEndGame;
+        if(gameState == 'endGame') table = PawnTableEndGame;
         table = PawnTable;
     } else if (piece.type === 'r') {
-        if(gameState == 'early') table = RookTableEarly
+        if(gameState == 'openning') table = RookTableEarly
         else table = RookTable
     } else if (piece.type === 'n') {
         table = KnightTable;
     } else if (piece.type === 'b') {
         table = BishopTable
     } else if (piece.type === 'q') {
-        if(gameState == 'early') table = QueenTableEarly
+        if(gameState == 'openning') table = QueenTableEarly
         else table = QueenTable
     } else if (piece.type === 'k') {
-        if(gameState == 'end') table = KingEndGameTable
+        if(gameState == 'endGame') table = KingEndGameTable
         table = KingMiddleGameTable
     }
 
@@ -261,7 +272,7 @@ const KingEndGameTable = [
 ]
 
 const KingMiddleGameTable = [
-    [-50, -60, -30, 10, 0, -40, -65, -55],
+    [-50, -100, -30, 10, 0, -40, -125, -115],
     [0, 10, 10, 10, 10, 10, 10, 0],
     [10, 20, 20, 20, 20, 20, 20, 10],
     [20, 30, 30, 30, 30, 30, 30, 20],
@@ -338,12 +349,12 @@ const RookTableEarly = [
 ]
 
 const RookTable = [
-    [-40, -40, -40, -40, -40, -40, -40, -40],
+    [-40, -40, -50, -60, -60, -50, -40, -40],
     [-40, -30, -30, -30, -30, -30, -30, -40],
+    [-50, -30, -20, -20, -20, -20, -30, -50],
+    [-60, -30, -20, 0, 0, -20, -30, -60],
+    [-60, -30, -20, 0, 0, -20, -30, -60],
+    [-50, -30, -20, 0, 0, -20, -30, -50],
     [-40, -30, -20, -20, -20, -20, -30, -40],
-    [-40, -30, -20, 0, 0, -20, -30, -40],
-    [-40, -30, -20, 0, 0, -20, -30, -40],
-    [-40, -30, -20, 0, 0, -20, -30, -40],
-    [-40, -30, -20, -20, -20, -20, -30, -40],
-    [-40, -40, -40, -40, -40, -40, -40, -40]
+    [-40, -40, -50, -60, -60, -50, -40, -40]
 ]

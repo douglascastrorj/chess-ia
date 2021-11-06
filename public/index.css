@@ -6,10 +6,11 @@
 
 body {
   height: 100vh;
+  background-color: #444;
 }
 
 main {
-    background-color: #444;
+
     display: flex;
     justify-content: center;
     align-items: center;
